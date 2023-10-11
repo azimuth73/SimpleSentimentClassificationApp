@@ -1,25 +1,20 @@
 import streamlit as st
+import numpy as np
 import pandas as pd
 
-st.write("""
-# Simple Streamlit App
-Hello *world* population!
-""")
+repository_link = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
 
-world_population_data_df = pd.read_csv("data/placeholder_data/world_population.csv")
+st.write(f'''
+# Simple Sentiment Classification
+This app implements machine learning based sentiment classification. Users can input text and select 
+a model from the dropdown menu to evaluate the sentiment of the text. For more information about the specifics of
+each model check out the [GitHub repository]({repository_link}) for this project.
+''')
 
-# Select only the population columns
-population_columns_indexes = world_population_data_df.columns[
-    world_population_data_df.columns.str.match(r'\d{4} Population')  # format: 'XXXX Population'
-]
+st.text_input('Input text:', key='input_text')  # Stored in st.session_state.input_text
 
-# Create a new DataFrame containing the sums of selected columns and reverse the order of both columns and values
-total_population = world_population_data_df[population_columns_indexes].sum()[::-1]
-
-# Convert the Series back to a DataFrame
-total_population_df = total_population.to_frame().T
-
-# Add a name to indicate it's the sum of all populations
-total_population_df.index = ['Total Population']
-
-st.line_chart(total_population_df)
+model_option = ['Model 1', 'Model 2', 'Model 3', 'Model 4']
+chosen_model = st.selectbox(
+    'Select model:',
+    model_option
+)
