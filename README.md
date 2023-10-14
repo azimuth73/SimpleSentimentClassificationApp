@@ -1,6 +1,6 @@
 # Simple Sentiment Classification App
 
-This project implements a machine learning-based sentiment classification app using Streamlit. Users can input text/comments and select a model from the dropdown menu to evaluate the sentiment of the text.
+This app implements machine learning based sentiment classification. Users can input text and select a model from the dropdown menu to evaluate the sentiment of the text.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ This project implements a machine learning-based sentiment classification app us
    pip install -r requirements.txt
 3. To run the app, use the following command:
    ```bash
-   streamlit run streamlit_app.py
+   streamlit run Home.py
 
 ## Usage
 
@@ -50,6 +50,8 @@ The app supports the following sentiment classification models:
 - Model 2: [Placeholder description of Model 2]
 
 - Model 3: [Placeholder description of Model 3]
+
+- Model 4: [Placeholder description of Model 4]
 
 ## License
 
