@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-st.set_page_config(page_title='Home - Simple Sentiment Classification')
+st.set_page_config(page_title='Home \u00B7 Simple Sentiment Classification')
 
 st.text_input('Input text:', key='input_text')  # Stored in st.session_state.input_text
 

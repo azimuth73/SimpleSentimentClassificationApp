@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title='About - Simple Sentiment Classification')
+st.set_page_config(page_title='About \u00B7 Simple Sentiment Classification')
 
 repository_link = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
 
