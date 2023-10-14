@@ -1,33 +1,88 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import random
+
+REPOSITORY_LINK = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
+
+MODEL_OPTION_NAMES = ['Model 1', 'Model 2', 'Model 3', 'Model 4']
+
+NEGATIVE_EMOJI_SHORTCODE = ':slightly_frowning_face:'
+NEUTRAL_EMOJI_SHORTCODE = ':neutral_face:'
+POSITIVE_EMOJI_SHORTCODE = ':slightly_smiling_face:'
+
+INPUT_TEXT_AREA_DESC = 'The text that will be used as an input to the selected model for sentiment classification.'
+MODEL_SELECT_BOX_DESC = f'''
+For more information about the specifics of
+each model check out the [GitHub repository]({REPOSITORY_LINK}) for this project.
+'''
+EVAL_BUTTON_DESC = 'Evaluate the sentiment of the written text using the selected model.'
 
 st.set_page_config(page_title='Home \u00B7 Simple Sentiment Classification')
 
-input_text_area_desc = 'The text that will be used as an input to the selected model for sentiment classification.'
-st.text_area(
+if 'eval_button_clicked' not in st.session_state:  # Stateful Button
+    st.session_state.eval_button_clicked = False
+
+if 'eval_text' not in st.session_state:
+    st.session_state.eval_text = ''
+
+if 'eval_model_index' not in st.session_state:
+    st.session_state.eval_model_index = 0
+
+if 'current_input_text' not in st.session_state:
+    st.session_state.current_input_text = ''
+
+
+def eval_button_func(input_text: str, model_name: str) -> None:
+    if not input_text:  # If string is empty ; later this should "do more" - check for whitespaces, special chars etc.
+        st.warning('Input text field cannot be empty!')
+        st.session_state.eval_button_clicked = False
+        return
+
+    if not st.session_state.eval_button_clicked:  # Stateful Button
+        st.session_state.eval_button_clicked = True
+
+    st.session_state.eval_text = input_text
+    st.session_state.eval_model_name = model_name
+
+    st.session_state.eval_score = random.choice([-1, 0, 1])  # Dummy implementation
+    if st.session_state.eval_score > 0:
+        st.session_state.eval_emoji_shortcode = POSITIVE_EMOJI_SHORTCODE
+    elif st.session_state.eval_score < 0:
+        st.session_state.eval_emoji_shortcode = NEGATIVE_EMOJI_SHORTCODE
+    else:
+        st.session_state.eval_emoji_shortcode = NEUTRAL_EMOJI_SHORTCODE
+
+
+st.text_area(  # Stored in st.session_state.input_text_area
     label='Input text:',
+    value=st.session_state.current_input_text,
     key='input_text_area',
-    help=input_text_area_desc
-)  # Stored in st.session_state.input_text_area
-
-
-model_option = ['Model 1', 'Model 2', 'Model 3', 'Model 4']
-repository_link = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
-model_select_box_desc = f'''
-For more information about the specifics of
-each model check out the [GitHub repository]({repository_link}) for this project.
-'''
-chosen_model = st.selectbox(
-    label='Select model:',
-    key='model_select_box',
-    options=model_option,
-    help=model_select_box_desc
+    help=INPUT_TEXT_AREA_DESC
 )
+st.session_state.current_input_text = st.session_state.input_text_area  # Temp to set the value while not initialised
 
-eval_button_desc = 'Evaluate the sentiment of the written text using the selected model.'
+
+selected_model_name = st.selectbox(
+    label='Select model:',
+    options=MODEL_OPTION_NAMES,
+    index=st.session_state.eval_model_index,
+    key='model_select_box',
+    help=MODEL_SELECT_BOX_DESC
+)
+st.session_state.eval_model_index = MODEL_OPTION_NAMES.index(selected_model_name)
+
+eval_func_args = (st.session_state.input_text_area, selected_model_name)  # Can use either temp or input_text_area
 st.button(
-    label='Evaluate', key='evaluate_text_button', help=eval_button_desc,
-    on_click=None, args=None, kwargs=None,
+    label='Evaluate', key='eval_button', help=EVAL_BUTTON_DESC,
+    on_click=eval_button_func, args=eval_func_args, kwargs=None,
     type="secondary", use_container_width=True
 )
+
+if st.session_state.eval_button_clicked:  # Dummy output display
+    st.write(f'''
+    {st.session_state.eval_text}
+    {st.session_state.eval_model_name}
+    {st.session_state.eval_score}
+    {st.session_state.eval_emoji_shortcode}
+    ''')
