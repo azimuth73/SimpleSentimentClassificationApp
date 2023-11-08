@@ -6,3 +6,7 @@ __pycache__
 
 # Python virtual environment
 venv
+
+# Pyenv local virtual enviorment python version
+.python-version
+
