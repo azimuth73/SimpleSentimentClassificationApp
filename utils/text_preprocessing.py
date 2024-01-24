@@ -14,7 +14,7 @@ def preprocess_text(text):
     # Convert to lowercase
     text = text.lower()
     # Remove words with non-letter characters
-    text = re.sub(r'\b(?:[A-Z0-9_]*[a-z][A-Za-z0-9_]*)*\b', ' ', text)
+    text = re.sub(r'\b[^a-z]+\b', ' ', text)  # This regular expression doesnt quite work, need to find a replacement
     # Remove stopwords
     stop_words = set(stopwords.words('english'))
     text = ' '.join([word for word in text.split() if word not in stop_words])
