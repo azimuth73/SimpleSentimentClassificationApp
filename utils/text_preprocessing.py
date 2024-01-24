@@ -11,13 +11,22 @@ nltk.download('stopwords')
 def preprocess_text(text):
     # Remove accents and convert to ASCII
     text = unidecode(text)
+
     # Convert to lowercase
     text = text.lower()
+
     # Remove words with non-letter characters
-    text = re.sub(r'\b[^a-z]+\b', ' ', text)  # This regular expression doesnt quite work, need to find a replacement
+    text = re.sub(r'\b[^a-z]+\b', ' ', text)  # This regular expression doesn't quite work, need to find a replacement
+    # PROBLEMS :
+    # Some entries become missing
+    # This currently only remove characters which are non-lowercase letter, and it doesn't remove them if they are at
+    # the beginning or end of string
+    # It separates some words instead of removing completely
+
     # Remove stopwords
     stop_words = set(stopwords.words('english'))
     text = ' '.join([word for word in text.split() if word not in stop_words])
+
     # Lemmatization
     lemmatizer = WordNetLemmatizer()
     text = ' '.join([lemmatizer.lemmatize(word) for word in text.split()])
