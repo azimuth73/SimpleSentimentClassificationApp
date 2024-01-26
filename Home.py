@@ -34,6 +34,7 @@ if 'current_input_text' not in st.session_state:
 
 
 def eval_button_func(input_text: str, model_name: str) -> None:
+    # TODO: Check if preprocessed text is not null or too simple in the future
     if not input_text:  # If string is empty ; later this should "do more" - check for whitespaces, special chars etc.
         st.warning('Input text field cannot be empty!')
         st.session_state.eval_button_clicked = False
@@ -45,7 +46,9 @@ def eval_button_func(input_text: str, model_name: str) -> None:
     st.session_state.eval_text = input_text
     st.session_state.eval_model_name = model_name
 
+    # TODO: actually implement the chosen model making a prediction
     st.session_state.eval_score = random.choice([-1, 0, 1])  # Dummy implementation
+
     if st.session_state.eval_score > 0:
         st.session_state.eval_emoji_shortcode = POSITIVE_EMOJI_SHORTCODE
     elif st.session_state.eval_score < 0:
@@ -79,6 +82,7 @@ st.button(
     type="secondary", use_container_width=True
 )
 
+# TODO: Make proper output based on the prediction of the chosen model
 if st.session_state.eval_button_clicked:  # Dummy output display
     st.write(f'''
     {st.session_state.eval_text}
