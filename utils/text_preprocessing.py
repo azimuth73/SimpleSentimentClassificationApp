@@ -1,4 +1,3 @@
-import re
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from unidecode import unidecode
@@ -11,7 +10,7 @@ nltk.download('stopwords')
 def remove_punctuation(text):
 
     # Replace characters in words that start or end with certain punctuation characters
-    punctuation_chars = '''.,:;!?()'"/#'''
+    punctuation_chars = '''.,:;!?()'"'''
 
     # strip method removes heading and trailing characters
     for char in punctuation_chars:
@@ -54,10 +53,10 @@ def preprocess_text(text, verbose=False):
     if verbose:
         print(f'Remove any words which contain non-letter characters anywhere inside them\n\n\t\t{text}\n\n')
 
-    # Remove words with two letters or fewer
-    text = ' '.join([word for word in text.split() if len(word) >= 3])
+    # Remove words with one letter
+    text = ' '.join([word for word in text.split() if len(word) >= 2])
     if verbose:
-        print(f'Remove words with two letters or fewer\n\n\t\t{text}\n\n')
+        print(f'Remove words with one letter\n\n\t\t{text}\n\n')
 
     # Remove stopwords
     stop_words = set(stopwords.words('english'))
@@ -78,8 +77,9 @@ def main():
     # Example usage:
     text_to_preprocess = "Aww Aw this is an example text with stopwords and some special characters! " \
                          "Visit https://example.com for more        info. #blessed #JustForLaughs " \
-                         "I am so happy today man. :) This stuff is pretty crazy!!!!"
-    preprocessed_text = preprocess_text(text_to_preprocess, verbose=True)
+                         "I am so happy today man. :) haha This stuff is pretty crazy!!!!" \
+                         "bljak hasdhuiahdw my man crazyyyy"
+    preprocess_text(text_to_preprocess, verbose=True)
 
 
 if __name__ == '__main__':
