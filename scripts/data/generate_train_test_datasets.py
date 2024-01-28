@@ -24,6 +24,11 @@ grouped_df = df.groupby('Sentiment')
 # Initialize empty DataFrames for train and test sets
 train_df = pd.DataFrame()
 test_df = pd.DataFrame()
+# TODO:
+#  Need to make a validation dataset
+#  A better approach to the current one is to take a more representative sample of data based on average text siz
+#  Need to make wordcloud for each of the datasets and the whole one
+
 
 # Iterate over each category
 for category, group in grouped_df:

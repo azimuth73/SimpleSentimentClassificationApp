@@ -8,7 +8,11 @@ nltk.download('stopwords')
 
 
 def remove_punctuation(text):
-
+    # TODO:
+    #  Some punctuation like !?.,():;" should be replaced with space
+    #  Others like ' should be replaced with nothing (so that certain english words don't become separated)
+    #  Currently this function only removes these at the start or end and doesn't take into account which chars should
+    #  be replaced and which should be removed
     # Replace characters in words that start or end with certain punctuation characters
     punctuation_chars = '''.,:;!?()'"'''
 
@@ -33,6 +37,8 @@ def remove_non_letter_words(text):
 
 
 def preprocess_text(text, verbose=False):
+    # TODO:
+    #  Need to filter some characters which appear 3 or more times because in english it's definitely a typo
     # Remove accents and convert to ASCII
     text = unidecode(text)
     if verbose:
@@ -42,6 +48,9 @@ def preprocess_text(text, verbose=False):
     text = text.lower()
     if verbose:
         print(f'Convert to lowercase\n\n\t\t{text}\n\n')
+
+    # TODO:
+    #   Removing mentions, hashtags and links should come here, before removing punctuation
 
     # Replace characters in words that start or end with certain punctuation characters
     text = remove_punctuation(text)
@@ -75,10 +84,12 @@ def preprocess_text(text, verbose=False):
 
 def main():
     # Example usage:
-    text_to_preprocess = "Aww Aw this is an example text with stopwords and some special characters! " \
-                         "Visit https://example.com for more        info. #blessed #JustForLaughs " \
-                         "I am so happy today man. :) haha This stuff is pretty crazy!!!!" \
-                         "bljak hasdhuiahdw my man crazyyyy"
+    text_to_preprocess = f'''
+    Hello, Peter!I am writing to you for one reason,btw it's really important, anyhow you should totallyyy look at the
+    data I sent you earlier.You're gonna be rly happy about it,I'm sure!!!!! :) sooo here is the link for you 
+    https://peter-data.com
+    '''
+
     preprocess_text(text_to_preprocess, verbose=True)
 
 
