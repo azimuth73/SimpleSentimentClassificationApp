@@ -1,5 +1,0 @@
-tweets_dataset_1
-https://www.kaggle.com/datasets/tariqsays/sentiment-dataset-with-1-million-tweets?resource=download
-
-tweets_dataset_2
-https://www.kaggle.com/datasets/yasserh/twitter-tweets-sentiment-dataset
