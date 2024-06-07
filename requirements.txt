@@ -8,3 +8,7 @@ torch
 nltk
 unidecode
 wordcloud
+transformers
+python-dotenv
+gdown
+Pillow
