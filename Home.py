@@ -61,9 +61,12 @@ if 'current_input_text' not in st.session_state:
 
 if 'model' not in st.session_state:
     name = st.session_state.model_option_names[st.session_state.eval_model_index]
-    st.session_state.model = load_model(name, os.path.join('models', name, 'model.pt'))
-    if not st.session_state.is_model_downloading:
+    filepath = os.path.join('models', name, 'model.pt')
+    if not st.session_state.is_model_downloading and not os.path.exists(filepath):
         download_model_files(st.session_state.eval_model_index)
+
+    st.session_state.model = load_model(name, filepath)
+
 
 
 def on_selectbox_change():
