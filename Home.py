@@ -4,7 +4,7 @@ from utils import (
     predict_sentiment,
     download_and_load_model_folders_json,
     temporarily_download_and_load_model_files,
-    load_image, load_metrics
+    load_image, load_metrics, load_model
 )
 
 REPOSITORY_LINK = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
@@ -36,20 +36,18 @@ if 'model_option_names' not in st.session_state:
 
 @st.cache_resource
 def download_model_files(eval_model_index):
-    if not st.session_state.is_model_downloading:
+    st.session_state.is_model_downloading = True
 
-        st.session_state.is_model_downloading = True
+    model_files = temporarily_download_and_load_model_files(
+        st.session_state.model_option_names[eval_model_index]
+    )
+    model, metrics, roc_curve, confusion_matrix = model_files
+    st.session_state.model = model
+    st.session_state.metrics = metrics
+    st.session_state.roc_curve = roc_curve
+    st.session_state.confusion_matrix = confusion_matrix
 
-        model_files = temporarily_download_and_load_model_files(
-            st.session_state.model_option_names[eval_model_index]
-        )
-        model, metrics, roc_curve, confusion_matrix = model_files
-        st.session_state.model = model
-        st.session_state.metrics = metrics
-        st.session_state.roc_curve = roc_curve
-        st.session_state.confusion_matrix = confusion_matrix
-
-        st.session_state.is_model_downloading = False
+    st.session_state.is_model_downloading = False
 
 
 if 'eval_button_clicked' not in st.session_state:  # Stateful Button
@@ -62,7 +60,10 @@ if 'current_input_text' not in st.session_state:
     st.session_state.current_input_text = ''
 
 if 'model' not in st.session_state:
-    download_model_files(st.session_state.eval_model_index)
+    name = st.session_state.model_option_names[st.session_state.eval_model_index]
+    st.session_state.model = load_model(name, os.path.join('models', name, 'model.pt'))
+    if not st.session_state.is_model_downloading:
+        download_model_files(st.session_state.eval_model_index)
 
 
 def eval_button_func(input_text: str, model_name: str) -> None:
@@ -86,55 +87,69 @@ def eval_button_func(input_text: str, model_name: str) -> None:
         st.session_state.eval_emoji_shortcode = NEGATIVE_EMOJI_SHORTCODE
 
 
-st.text_area(  # Stored in st.session_state.input_text_area
-    label='Input text:',
-    value=st.session_state.current_input_text,
-    key='input_text_area',
-    help=INPUT_TEXT_AREA_DESC
-)
-st.session_state.current_input_text = st.session_state.input_text_area  # Temp to set the value while not initialised
+if st.session_state.is_model_downloading:
+    info_message_container = st.container(border=True)
+    info_message_container.write('Please wait while the model is downloading. This may take some time depending on the chosen model...')
+if not st.session_state.is_model_downloading:
+    st.text_area(  # Stored in st.session_state.input_text_area
+        label='Input text:',
+        value=st.session_state.current_input_text,
+        key='input_text_area',
+        help=INPUT_TEXT_AREA_DESC
+    )
+    st.session_state.current_input_text = st.session_state.input_text_area  # Temp to set the value while not initialised
 
+    selected_model_name = st.selectbox(
+        label='Select model:',
+        options=st.session_state.model_option_names,
+        index=st.session_state.eval_model_index,
+        key='model_select_box',
+        help=MODEL_SELECT_BOX_DESC,
+    )
+    st.session_state.eval_model_index = st.session_state.model_option_names.index(selected_model_name)
 
-selected_model_name = st.selectbox(
-    label='Select model:',
-    options=st.session_state.model_option_names,
-    index=st.session_state.eval_model_index,
-    key='model_select_box',
-    help=MODEL_SELECT_BOX_DESC,
-)
-st.session_state.eval_model_index = st.session_state.model_option_names.index(selected_model_name)
-download_model_files(st.session_state.eval_model_index)
-st.session_state.metrics = load_metrics(os.path.join('models', selected_model_name, 'metrics.tsv'))
-st.session_state.confusion_matrix = load_image(os.path.join('models', selected_model_name, 'confusion_matrix.png'))
-st.session_state.roc_curve = load_image(os.path.join('models', selected_model_name, 'roc_curve.png'))
+    download_model_files(st.session_state.eval_model_index)
 
+    st.session_state.metrics = load_metrics(os.path.join('models', selected_model_name, 'metrics.tsv'))
+    st.session_state.confusion_matrix = load_image(os.path.join('models', selected_model_name, 'confusion_matrix.png'))
+    st.session_state.roc_curve = load_image(os.path.join('models', selected_model_name, 'roc_curve.png'))
 
-eval_func_args = (st.session_state.input_text_area, selected_model_name)  # Can use either temp or input_text_area
-if 'model' in st.session_state and not st.session_state.is_model_downloading:
+    eval_func_args = (st.session_state.input_text_area, selected_model_name)  # Can use either temp or input_text_area
+
     st.button(
         label='Evaluate', key='eval_button', help=EVAL_BUTTON_DESC,
         on_click=eval_button_func, args=eval_func_args, kwargs=None,
         type='secondary', use_container_width=True
     )
 
-# TODO: Make proper output based on the prediction of the chosen model
-if st.session_state.eval_button_clicked:  # Dummy output display
-    st.write(f'''
-    {st.session_state.eval_text}
-    {st.session_state.eval_model_name}
-    {st.session_state.eval_score}
-    {st.session_state.eval_emoji_shortcode}
-    ''')
+    # TODO: Make proper output based on the prediction of the chosen model
+    if st.session_state.eval_button_clicked and 'eval_score' in st.session_state:  # Dummy output display
+        st.write(f'''
+        {st.session_state.eval_text}
+        {st.session_state.eval_model_name}
+        {st.session_state.eval_score}
+        {st.session_state.eval_emoji_shortcode}
+        ''')
 
-if 'metrics' in st.session_state:
-    scores = ['Accuracy', 'Precision', 'Recall', 'F1', 'ROC-AUC', 'Loss']
-    row1 = st.columns(3)
-    row2 = st.columns(3)
+    if 'metrics' in st.session_state:
+        scores = ['Accuracy', 'Precision', 'Recall', 'F1', 'ROC-AUC', 'Loss']
+        row1 = st.columns(3)
+        row2 = st.columns(3)
 
-    for i, col in enumerate(row1 + row2):
-        tile = col.container(height=120)
-        tile.write(f'{scores[i]}')
-        if i < 3:
-            tile.write(f'{st.session_state.metrics[scores[i]]:.2%}')
-        else:
-            tile.write(f'{st.session_state.metrics[scores[i]]:.4f}')
+        for i, col in enumerate(row1 + row2):
+            tile = col.container(height=120)
+            tile.write(f'{scores[i]}')
+            if i < 3:
+                tile.write(f'{st.session_state.metrics[scores[i]]:.2%}')
+            else:
+                tile.write(f'{st.session_state.metrics[scores[i]]:.4f}')
+
+    if 'confusion_matrix' in st.session_state and 'roc_curve' in st.session_state:
+
+        confusion_matrix_col, roc_curve_col, = st.columns(2)
+        confusion_matrix_tile = confusion_matrix_col.container(border=True)
+        roc_curve_tile = roc_curve_col.container(border=True)
+
+        confusion_matrix_tile.image(st.session_state.confusion_matrix)
+        roc_curve_tile.image(st.session_state.roc_curve)
+        

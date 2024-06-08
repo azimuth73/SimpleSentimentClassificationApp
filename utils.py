@@ -7,6 +7,7 @@ import json
 import os
 import numpy as np
 from PIL import Image
+import streamlit as st
 
 
 class TransformerBinarySequenceClassificator(nn.Module):
@@ -66,11 +67,12 @@ def predict_sentiment(model, sentence: str, max_sequence_length: int = 50):
     return prediction
 
 
+@st.cache_data
 def download_and_load_model_folders_json():
-    load_dotenv()
-
-    model_folders_json_id = os.getenv('MODEL_FOLDERS_JSON_ID')
-    gdown.download(id=model_folders_json_id, output='model_folders.json')
+    if not os.path.exists('model_folders.json'):
+        load_dotenv()
+        model_folders_json_id = os.getenv('MODEL_FOLDERS_JSON_ID')
+        gdown.download(id=model_folders_json_id, output='model_folders.json')
 
     with open('model_folders.json', 'r') as f:
         model_folders_json = json.load(f)
@@ -95,25 +97,29 @@ def load_image(filepath):
     return image
 
 
-def temporarily_download_and_load_model_files(model_name: str):
-    def load_model(name: str, filepath: str):
-        classificator = TransformerBinarySequenceClassificator(model_name=name, requires_grad=False)
-        classificator.load_state_dict(torch.load(filepath, map_location=torch.device('cpu')))
-        classificator.eval()
-        return classificator
+def load_model(name: str, filepath: str):
+    classificator = TransformerBinarySequenceClassificator(model_name=name, requires_grad=False)
+    classificator.load_state_dict(torch.load(filepath, map_location=torch.device('cpu')))
+    classificator.eval()
+    return classificator
 
+
+def temporarily_download_and_load_model_files(model_name: str):
     model_folders_json = download_and_load_model_folders_json()
-    model_folder_id = None
-    for model_folder_json in model_folders_json:
-        if model_folder_json['name'] == model_name:
-            model_folder_id = model_folder_json['id']
-            break
-    if not model_folder_id:
-        return None
 
     download_path = f'models/{model_name}'
-    os.makedirs(download_path, exist_ok=True)
-    gdown.download_folder(id=model_folder_id, output=download_path, quiet=False)
+
+    if not os.path.exists(download_path):
+        model_folder_id = None
+        for model_folder_json in model_folders_json:
+            if model_folder_json['name'] == model_name:
+                model_folder_id = model_folder_json['id']
+                break
+        if not model_folder_id:
+            return None
+
+        os.makedirs(download_path, exist_ok=True)
+        gdown.download_folder(id=model_folder_id, output=download_path, quiet=False)
 
     model = load_model(model_name, os.path.join(download_path, 'model.pt'))
     metrics: dict = load_metrics(os.path.join(download_path, 'metrics.tsv'))
@@ -121,8 +127,8 @@ def temporarily_download_and_load_model_files(model_name: str):
     confusion_matrix_image = load_image(os.path.join(download_path, 'confusion_matrix.png'))
 
     # Delete the downloaded model file
-    if os.path.exists(os.path.join(download_path, 'model.pt')):
-        os.remove(os.path.join(download_path, 'model.pt'))
+    # if os.path.exists(os.path.join(download_path, 'model.pt')):
+    #     os.remove(os.path.join(download_path, 'model.pt'))
 
     return model, metrics, roc_curve_image, confusion_matrix_image
 
