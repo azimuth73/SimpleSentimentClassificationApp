@@ -73,8 +73,7 @@ def eval_button_func(input_text: str, model_name: str) -> None:
     st.session_state.eval_text = input_text
     st.session_state.eval_model_name = model_name
 
-    # TODO: actually implement the chosen model making a prediction
-    st.session_state.eval_score = random.choice([0, 1])  # Dummy implementation
+    st.session_state.eval_score = predict_sentiment(st.session_state.model, st.session_state.eval_text)
 
     if st.session_state.eval_score == 1:
         st.session_state.eval_emoji_shortcode = POSITIVE_EMOJI_SHORTCODE
@@ -102,11 +101,12 @@ st.session_state.eval_model_index = st.session_state.model_option_names.index(se
 download_model_files(st.session_state.eval_model_index)
 
 eval_func_args = (st.session_state.input_text_area, selected_model_name)  # Can use either temp or input_text_area
-st.button(
-    label='Evaluate', key='eval_button', help=EVAL_BUTTON_DESC,
-    on_click=eval_button_func, args=eval_func_args, kwargs=None,
-    type='secondary', use_container_width=True
-)
+if 'model' in st.session_state and not st.session_state.is_model_downloading:
+    st.button(
+        label='Evaluate', key='eval_button', help=EVAL_BUTTON_DESC,
+        on_click=eval_button_func, args=eval_func_args, kwargs=None,
+        type='secondary', use_container_width=True
+    )
 
 # TODO: Make proper output based on the prediction of the chosen model
 if st.session_state.eval_button_clicked:  # Dummy output display
@@ -116,3 +116,13 @@ if st.session_state.eval_button_clicked:  # Dummy output display
     {st.session_state.eval_score}
     {st.session_state.eval_emoji_shortcode}
     ''')
+
+if 'metrics' in st.session_state:
+    scores = ['Accuracy', 'Precision', 'Recall', 'F1', 'ROC-AUC', 'Loss']
+    row1 = st.columns(3)
+    row2 = st.columns(3)
+
+    for i, col in enumerate(row1 + row2):
+        tile = col.container(height=120)
+        tile.write(f'{scores[i]}')
+        tile.write(st.session_state.metrics[scores[i]])
