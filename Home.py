@@ -66,6 +66,10 @@ if 'model' not in st.session_state:
         download_model_files(st.session_state.eval_model_index)
 
 
+def on_selectbox_change():
+    st.session_state.eval_button_clicked = False
+
+
 def eval_button_func(input_text: str, model_name: str) -> None:
     # TODO: Check if preprocessed text is not null or too simple in the future
     if not input_text:  # If string is empty ; later this should "do more" - check for whitespaces, special chars etc.
@@ -105,6 +109,7 @@ if not st.session_state.is_model_downloading:
         index=st.session_state.eval_model_index,
         key='model_select_box',
         help=MODEL_SELECT_BOX_DESC,
+        on_change=on_selectbox_change
     )
     st.session_state.eval_model_index = st.session_state.model_option_names.index(selected_model_name)
 
@@ -121,15 +126,33 @@ if not st.session_state.is_model_downloading:
         on_click=eval_button_func, args=eval_func_args, kwargs=None,
         type='secondary', use_container_width=True
     )
+    st.divider()
 
     # TODO: Make proper output based on the prediction of the chosen model
     if st.session_state.eval_button_clicked and 'eval_score' in st.session_state:  # Dummy output display
-        st.write(f'''
-        {st.session_state.eval_text}
-        {st.session_state.eval_model_name}
-        {st.session_state.eval_score}
-        {st.session_state.eval_emoji_shortcode}
-        ''')
+        # eval_container = st.container(border=True)
+
+        row = st.columns(3)
+        # eval_container.add_rows(row)
+        tiles = []
+        for col in row:
+            tiles.append(col.container(border=True))
+        if st.session_state.eval_score == 0:
+            eval_desc = 'NEGATIVE SENTIMENT'
+        else:
+            eval_desc = 'POSITIVE SENTIMENT'
+
+        tiles[0].write(st.session_state.eval_score)
+        tiles[1].write(eval_desc)
+        tiles[2].write(st.session_state.eval_emoji_shortcode)
+
+        # eval_container.write(f'''
+        # {st.session_state.eval_text}
+        # {st.session_state.eval_model_name}
+        # {st.session_state.eval_score}
+        # {st.session_state.eval_emoji_shortcode}
+        # ''')
+        st.divider()
 
     if 'metrics' in st.session_state:
         scores = ['Accuracy', 'Precision', 'Recall', 'F1', 'ROC-AUC', 'Loss']
@@ -144,6 +167,8 @@ if not st.session_state.is_model_downloading:
             else:
                 tile.write(f'{st.session_state.metrics[scores[i]]:.4f}')
 
+        st.divider()
+
     if 'confusion_matrix' in st.session_state and 'roc_curve' in st.session_state:
 
         confusion_matrix_col, roc_curve_col, = st.columns(2)
@@ -152,4 +177,3 @@ if not st.session_state.is_model_downloading:
 
         confusion_matrix_tile.image(st.session_state.confusion_matrix)
         roc_curve_tile.image(st.session_state.roc_curve)
-        
