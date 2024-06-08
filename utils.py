@@ -1,11 +1,10 @@
 import torch
 from torch import nn
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-import os
 from dotenv import load_dotenv
 import gdown
 import json
-import shutil
+import os
 import numpy as np
 from PIL import Image
 
@@ -79,27 +78,29 @@ def download_and_load_model_folders_json():
     return model_folders_json
 
 
+def load_metrics(filepath):
+    data: dict = {}
+    with open(filepath, 'r') as file:
+        for line in file:
+            metric_name, metric_value = line.strip().split('\t')
+            data[metric_name] = float(metric_value)
+    return data
+
+
+def load_image(filepath):
+    image = Image.open(filepath)
+    image = image.convert('RGB')
+    image = np.array(image)
+
+    return image
+
+
 def temporarily_download_and_load_model_files(model_name: str):
     def load_model(name: str, filepath: str):
         classificator = TransformerBinarySequenceClassificator(model_name=name, requires_grad=False)
         classificator.load_state_dict(torch.load(filepath, map_location=torch.device('cpu')))
         classificator.eval()
         return classificator
-
-    def load_metrics(filepath):
-        data: dict = {}
-        with open(filepath, 'r') as file:
-            for line in file:
-                metric_name, metric_value = line.strip().split('\t')
-                data[metric_name] = float(metric_value)
-        return data
-
-    def load_image(filepath):
-        image = Image.open(filepath)
-        image = image.convert('RGB')
-        image = np.array(image)
-
-        return image
 
     model_folders_json = download_and_load_model_folders_json()
     model_folder_id = None
@@ -119,8 +120,9 @@ def temporarily_download_and_load_model_files(model_name: str):
     roc_curve_image = load_image(os.path.join(download_path, 'roc_curve.png'))
     confusion_matrix_image = load_image(os.path.join(download_path, 'confusion_matrix.png'))
 
-    # Delete the downloaded model folder
-    shutil.rmtree(download_path)
+    # Delete the downloaded model file
+    if os.path.exists(os.path.join(download_path, 'model.pt')):
+        os.remove(os.path.join(download_path, 'model.pt'))
 
     return model, metrics, roc_curve_image, confusion_matrix_image
 

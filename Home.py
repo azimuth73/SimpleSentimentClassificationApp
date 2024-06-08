@@ -1,6 +1,11 @@
 import streamlit as st
-import random
-from utils import predict_sentiment, download_and_load_model_folders_json, temporarily_download_and_load_model_files
+import os
+from utils import (
+    predict_sentiment,
+    download_and_load_model_folders_json,
+    temporarily_download_and_load_model_files,
+    load_image, load_metrics
+)
 
 REPOSITORY_LINK = "https://github.com/azimuth73/SimpleSentimentClassificationApp"
 
@@ -99,6 +104,10 @@ selected_model_name = st.selectbox(
 )
 st.session_state.eval_model_index = st.session_state.model_option_names.index(selected_model_name)
 download_model_files(st.session_state.eval_model_index)
+st.session_state.metrics = load_metrics(os.path.join('models', selected_model_name, 'metrics.tsv'))
+st.session_state.confusion_matrix = load_image(os.path.join('models', selected_model_name, 'confusion_matrix.png'))
+st.session_state.roc_curve = load_image(os.path.join('models', selected_model_name, 'roc_curve.png'))
+
 
 eval_func_args = (st.session_state.input_text_area, selected_model_name)  # Can use either temp or input_text_area
 if 'model' in st.session_state and not st.session_state.is_model_downloading:
@@ -125,4 +134,7 @@ if 'metrics' in st.session_state:
     for i, col in enumerate(row1 + row2):
         tile = col.container(height=120)
         tile.write(f'{scores[i]}')
-        tile.write(st.session_state.metrics[scores[i]])
+        if i < 3:
+            tile.write(f'{st.session_state.metrics[scores[i]]:.2%}')
+        else:
+            tile.write(f'{st.session_state.metrics[scores[i]]:.4f}')

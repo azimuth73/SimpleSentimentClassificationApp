@@ -10,5 +10,5 @@ unidecode
 wordcloud
 transformers
 python-dotenv
-gdown
+gdown>=5.0.0
 Pillow
