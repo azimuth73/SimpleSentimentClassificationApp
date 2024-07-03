@@ -2,19 +2,6 @@
 
 This app implements machine learning based sentiment classification. Users can input text and select a model from the dropdown menu to evaluate the sentiment of the text.
 
-## Table of Contents
-
-- [Demo](#demo)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Models](#models)
-- [License](#license)
-
-## Demo
-
-[Placeholder GIF or a screenshot demonstrating the app in action]
-
 ## Features
 
 - **User-Friendly Interface**: The app provides an intuitive interface for users to input text and select a sentiment classification model.
@@ -40,18 +27,6 @@ This app implements machine learning based sentiment classification. Users can i
 ## Usage
 
 Visit **http://localhost:8501** in your web browser to use the app.
-
-## Models
-
-The app supports the following sentiment classification models:
-
-- Model 1: [Placeholder description of Model 1]
-
-- Model 2: [Placeholder description of Model 2]
-
-- Model 3: [Placeholder description of Model 3]
-
-- Model 4: [Placeholder description of Model 4]
 
 ## License
 
