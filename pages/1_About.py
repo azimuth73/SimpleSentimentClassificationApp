@@ -27,8 +27,7 @@ tensors. This ensures that the input data is properly formatted for training.
 - **Model Selection**: Multiple pre-trained models from Hugging Face's model hub are utilized, including:
     - **BERT** (bert-base-uncased, bert-large-uncased)
     - **RoBERTa** (roberta-base, roberta-large)
-    - **AlBERT** (albert-base-v1, albert-large-v1, albert-xlarge-v1, albert-xxlarge-v1, albert-base-v2, albert-large-v2,
-     albert-xlarge-v2, albert-xxlarge-v2)
+    - **AlBERT** (albert-base-v1, albert-xlarge-v1, albert-xxlarge-v1, albert-base-v2, albert-xxlarge-v2)
     - **DistilRoBERTa** (distilroberta-base)
     - **CamemBERT** (camembert-base)
     - **XLM-RoBERTa** (xlm-roberta-base, xlm-roberta-large)
@@ -47,16 +46,11 @@ The application employs a variety of pre-trained models to ensure robust perform
 - **bert-base-cased**: 12-layer, 768-hidden, 12-heads, 110M parameters. Trained on cased English text.
 - **bert-large-cased**: 24-layer, 1024-hidden, 16-heads, 340M parameters. Trained on cased English text.
 - **albert-base-v1**: 12 repeating layers, 128 embedding, 768-hidden, 12-heads, 11M parameters. ALBERT base model.
-- **albert-large-v1**: 24 repeating layers, 128 embedding, 1024-hidden, 16-heads, 17M parameters. ALBERT large model.
 - **albert-xlarge-v1**: 24 repeating layers, 128 embedding, 2048-hidden, 16-heads, 58M parameters. ALBERT xlarge model.
 - **albert-xxlarge-v1**: 12 repeating layer, 128 embedding, 4096-hidden, 64-heads, 223M parameters. 
 ALBERT xxlarge model.
 - **albert-base-v2**: 12 repeating layers, 128 embedding, 768-hidden, 12-heads, 11M parameters. ALBERT base model with 
 no dropout, additional training data and longer training.
-- **albert-large-v2**: 24 repeating layers, 128 embedding, 1024-hidden, 16-heads, 17M parameters. ALBERT large model 
-with no dropout, additional training data and longer training.
-- **albert-xlarge-v2**: 24 repeating layers, 128 embedding, 2048-hidden, 16-heads, 58M parameters. ALBERT xlarge model 
-with no dropout, additional training data and longer training.
 - **albert-xxlarge-v2**: 12 repeating layer, 128 embedding, 4096-hidden, 64-heads, 223M parameters. ALBERT xxlarge model
  with no dropout, additional training data and longer training.
 - **roberta-base**: 12-layer, 768-hidden, 12-heads, 125M parameters. RoBERTa using the BERT-base architecture.
